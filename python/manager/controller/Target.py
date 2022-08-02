@@ -51,8 +51,7 @@ class TargetCtrl(Resource):
         return target, 200
 
     def list(self, offset=0, limit=10000):
-        targets_found = targets.query.offset(offset).limit(limit).all()
-        return targets_found
+        return targets.query.offset(offset).limit(limit).all()
 
     @marshal_with(target_fields)
     def get(self, id=None):
@@ -60,13 +59,12 @@ class TargetCtrl(Resource):
         parser.add_argument('offset', type=int)
         parser.add_argument('limit', type=int)
         args = parser.parse_args()
-        if id is None:
-            if args['offset'] is not None and args['limit'] is not None:
-                return self.list(args['offset'], args['limit'])
-            else:
-                return self.list()
-        else:
+        if id is not None:
             return self.read(id)
+        if args['offset'] is not None and args['limit'] is not None:
+            return self.list(args['offset'], args['limit'])
+        else:
+            return self.list()
 
     @marshal_with(target_fields)
     def post(self):

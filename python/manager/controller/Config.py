@@ -28,9 +28,8 @@ class ConfigCtrl(Resource):
 
     @marshal_with(config_fields)
     def post(self):
-        err = list()
+        err = []
         target_id = None
-        job_id = None
         parser = reqparse.RequestParser()
         parser.add_argument('job_id', type=int)
         parser.add_argument('target_id', type=int)
@@ -44,13 +43,12 @@ class ConfigCtrl(Resource):
         # Determine if this is for a target or a job
         if args.target_id is not None and args.target_id != 0:
             target_id = args.target_id
-        if args.job_id is not None and args.job_id != 0:
-            job_id = args.job_id
+        job_id = args.job_id if args.job_id is not None and args.job_id != 0 else None
         if target_id is not None and job_id is not None:
             err.append("target_id and job_id are mutually exclusive")
         if target_id is None and job_id is None:
             err.append('must supply either a target_id or a job_id')
-        if len(err) != 0:
+        if err:
             abort(400, err=', '.join(err))
         # Ok, make one.
         if target_id is None:
@@ -62,7 +60,6 @@ class ConfigCtrl(Resource):
     @marshal_with(config_fields)
     def get(self):
         target_id = None
-        job_id = None
         parser = reqparse.RequestParser()
         parser.add_argument('job_id', type=int)
         parser.add_argument('target_id', type=int)
@@ -71,8 +68,7 @@ class ConfigCtrl(Resource):
         # Determine if this is for a target or a job
         if args.target_id is not None and args.target_id != 0:
             target_id = args.target_id
-        if args.job_id is not None and args.job_id != 0:
-            job_id = args.job_id
+        job_id = args.job_id if args.job_id is not None and args.job_id != 0 else None
         if target_id is not None and job_id is not None:
             abort(400, err='target_id and job_id are mutually exclusive')
 
@@ -83,6 +79,5 @@ class ConfigCtrl(Resource):
             query = query.filter_by(job_id=job_id)
         if target_id is not None:
             query = query.filter_by(target_id=target_id)
-        configs = query.all()
         #configs = [config.as_dict() for config in configs]
-        return configs
+        return query.all()

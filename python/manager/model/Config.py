@@ -23,5 +23,4 @@ class FuzzingConfig(db.Model):
         self.value = config_value
 
     def as_dict(self):
-        out = {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
-        return out
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}

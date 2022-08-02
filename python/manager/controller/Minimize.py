@@ -8,7 +8,7 @@ from sqlalchemy.sql.expression import func
 db = app.config['db']
 
 def minimize(target_id, num_files_per_edge = None):
-    if num_files_per_edge == None:
+    if num_files_per_edge is None:
         num_files_per_edge = 1
 
     # get the data
@@ -55,4 +55,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     files = minimize(args.target_id, args.s)
-    print("Working set: {}".format(", ".join(files)))
+    print(f'Working set: {", ".join(files)}')

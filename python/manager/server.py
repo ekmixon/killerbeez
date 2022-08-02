@@ -4,7 +4,7 @@ import logging
 import os.path
 
 import sys
-  
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -41,6 +41,6 @@ if __name__ == '__main__':
         import tests.seeds as seeds
         # Seed data into the database for testing.
         if not seeds.seed(db, args.seed):
-            print("DEBUG ERROR: Attempting to seed db for invalid test: {}".format(args.seed))
+            print(f"DEBUG ERROR: Attempting to seed db for invalid test: {args.seed}")
 
     app.run(host='0.0.0.0')

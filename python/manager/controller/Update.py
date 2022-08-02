@@ -5,7 +5,7 @@ import os, zipfile, hashlib
 
 class UpdateCtrl(Resource):
     def get(self, hash):
-        path = 'static' + os.sep + 'client.zip'
+        path = f'static{os.sep}client.zip'
         try:
             os.remove(path)
         except:

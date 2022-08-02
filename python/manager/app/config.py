@@ -4,4 +4,4 @@ DATABASE_URI = "sqlite:///../../../../moflow.db"
 #DATABASE_URI = "postgresql://localhost/killerbeez?user=killerbeez&password=killerbeez"
 MANAGER_VERSION = 0.1
 CLIENT_FOLDER = "client"
-UPLOAD_FOLDER = 'static' + os.sep + 'upload'
+UPLOAD_FOLDER = f'static{os.sep}upload'

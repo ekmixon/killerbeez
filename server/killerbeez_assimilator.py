@@ -50,7 +50,7 @@ class KillerbeezAssimilator(assimilator.Assimilator):
             cwd='..', stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
         if process.returncode:
-            self.logError('Error staging file: {} | {}\n'.format(stdout, stderr))
+            self.logError(f'Error staging file: {stdout} | {stderr}\n')
             return None
 
         # Try to parse stdout to find out where the file was staged to
@@ -69,18 +69,22 @@ class KillerbeezAssimilator(assimilator.Assimilator):
         job_id = wu.id
         # ET doesn't like multiple root elements, so we need to wrap the whole
         # document in one element
-        xml_doc = ET.fromstring('<xml_doc>{}</xml_doc>'.format(wu.xml_doc))
+        xml_doc = ET.fromstring(f'<xml_doc>{wu.xml_doc}</xml_doc>')
         file_name_element = xml_doc.find("workunit/file_ref[open_name='seed']/file_name")
         if file_name_element is None:
             return # TODO: error handling
         seed_file = filename_to_download_path(file_name_element.text)
-        requests.put('{}/boinc_job/{}'.format(API_SERVER, job_id),
-                    json={'seed_file': seed_file, 'status': 'completed'})
+        requests.put(
+            f'{API_SERVER}/boinc_job/{job_id}',
+            json={'seed_file': seed_file, 'status': 'completed'},
+        )
 
     def _record_result(self, file_path, result_type, job_id):
         # TODO: use client helper module, maybe
-        requests.post('{}/boinc_job/{}/results'.format(API_SERVER, job_id),
-                    json={'repro_file': file_path, 'result_type': result_type})
+        requests.post(
+            f'{API_SERVER}/boinc_job/{job_id}/results',
+            json={'repro_file': file_path, 'result_type': result_type},
+        )
 
     def _process_zipfile(self, job_id, output_file):
         tempdir = tempfile.mkdtemp()
@@ -90,10 +94,10 @@ class KillerbeezAssimilator(assimilator.Assimilator):
                     match = re.match(r'killerbeez_result_([a-z]+)_([A-Za-z0-9]+)', result_name)
                     if not match:
                         continue
-                    result_type = match.group(1)
-                    md5 = match.group(2)
+                    result_type = match[1]
+                    md5 = match[2]
 
-                    filename = os.path.join(tempdir, 'input_{}'.format(md5.lower()))
+                    filename = os.path.join(tempdir, f'input_{md5.lower()}')
                     with open(filename, 'wb') as dest, results_file.open(result_name) as src:
                         dest.write(src.read())
 

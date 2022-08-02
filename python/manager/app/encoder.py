@@ -3,8 +3,7 @@ import json
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         try:
-            ts = o.timestamp()
-            return ts
+            return o.timestamp()
         except AttributeError:
             pass
 

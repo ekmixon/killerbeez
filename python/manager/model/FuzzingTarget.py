@@ -17,7 +17,7 @@ class targets(db.Model):
         self.target_executable = exe
 
     def __str__(self):
-        return '{}_{}'.format(self.target_executable, self.platform)
+        return f'{self.target_executable}_{self.platform}'
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}

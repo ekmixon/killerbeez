@@ -41,15 +41,15 @@ def bat_escape(args):
     # to mangle it first so we must escape all chars it considers special.
     metachars = ['(', ')', '%', '!', '^', '"', '<', '>', '&', '|']
     for char in metachars:
-        final_cmdline = final_cmdline.replace(char, '^'+char)
-    return '%1 {}'.format(final_cmdline)
+        final_cmdline = final_cmdline.replace(char, f'^{char}')
+    return f'%1 {final_cmdline}'
 
 
 def sh_escape(args):
     escaped_args = [shlex.quote(arg) for arg in args]
     # The >&2 redirects stdout to stderr, which will make it show up in the
     # BOINC UI
-    return '$1 >&2 {}'.format(' '.join(escaped_args))
+    return f"$1 >&2 {' '.join(escaped_args)}"
 
 
 def format_cmdline(
@@ -85,7 +85,7 @@ def format_cmdline(
         return bat_escape(args)
     else:
         if shell_format:
-            raise errors.InputError('Unknown shell_format "{}"'.format(shell_format))
+            raise errors.InputError(f'Unknown shell_format "{shell_format}"')
         else:
             raise errors.InputError(
                 'This target has no shell_format configured. Set the '

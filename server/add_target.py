@@ -35,21 +35,21 @@ def parse_args():
     return parser.parse_args()
 
 def add_app(project_file, name, platform):
-    app_name = '{}_{}'.format(name, platform)
+    app_name = f'{name}_{platform}'
     for node in project_file.elements:
         if node._name == 'app' and node.name == app_name:
-            print('App {} already in project.xml, not adding app'.format(app_name))
+            print(f'App {app_name} already in project.xml, not adding app')
             return
 
     a = project_file.elements.make_node_and_append('app')
     a.name = app_name
-    a.user_friendly_name = '{} running on {}'.format(name, platform)
+    a.user_friendly_name = f'{name} running on {platform}'
 
 def create_app_dir(name, platform):
-    app_name = '{}_{}'.format(name, platform)
+    app_name = f'{name}_{platform}'
     app_dir = os.path.join('apps', app_name)
     if os.path.exists(app_dir):
-        print('App directory {} already exists, not adding app versions'.format(app_dir))
+        print(f'App directory {app_dir} already exists, not adding app versions')
         return
 
     app_version_dir = os.path.join(app_dir, '1', platform)
@@ -69,39 +69,50 @@ def create_app_dir(name, platform):
                 version_file.write(version_xml)
 
 def create_app_templates(name, platform):
-    in_template_path = os.path.join('templates', '{}_{}_in'.format(name, platform))
+    in_template_path = os.path.join('templates', f'{name}_{platform}_in')
     if os.path.exists(in_template_path):
-        print('Input template {} already exists, not adding templates'.format(in_template_path))
+        print(
+            f'Input template {in_template_path} already exists, not adding templates'
+        )
+
         return
-    out_template_path = os.path.join('templates', '{}_{}_out'.format(name, platform))
+    out_template_path = os.path.join('templates', f'{name}_{platform}_out')
     if os.path.exists(out_template_path):
-        print('Output template {} already exists, not adding templates'.format(out_template_path))
+        print(
+            f'Output template {out_template_path} already exists, not adding templates'
+        )
+
         return
 
-    shutil.copyfile(os.path.join('skel', 'templates', '{}_in'.format(platform)), in_template_path)
-    shutil.copyfile(os.path.join('skel', 'templates', '{}_out'.format(platform)), out_template_path)
+    shutil.copyfile(
+        os.path.join('skel', 'templates', f'{platform}_in'), in_template_path
+    )
+
+    shutil.copyfile(
+        os.path.join('skel', 'templates', f'{platform}_out'), out_template_path
+    )
 
 
 def add_daemons(config_file, name, platform):
-    app_name = '{}_{}'.format(name, platform)
-    cmd = 'killerbeez_assimilator.py -app {}'.format(app_name)
+    app_name = f'{name}_{platform}'
+    cmd = f'killerbeez_assimilator.py -app {app_name}'
 
     for node in config_file.daemons:
         if node.cmd == cmd:
-            print('Assimilator daemon for app {} already exists, not adding it'.format(app_name))
+            print(f'Assimilator daemon for app {app_name} already exists, not adding it')
             return
 
     daemon = config_file.daemons.make_node_and_append('daemon')
     daemon.cmd = cmd
-    daemon.pid_file = 'killerbeez_assimilator_{}.pid'.format(app_name)
-    daemon.lock_file = 'killerbeez_assimilator_{}.lock'.format(app_name)
-    daemon.output = 'killerbeez_assimilator_{}.log'.format(app_name)
+    daemon.pid_file = f'killerbeez_assimilator_{app_name}.pid'
+    daemon.lock_file = f'killerbeez_assimilator_{app_name}.lock'
+    daemon.output = f'killerbeez_assimilator_{app_name}.log'
 
     daemon = config_file.daemons.make_node_and_append('daemon')
-    daemon.cmd = 'sample_trivial_validator --app {}'.format(app_name)
-    daemon.pid_file = 'sample_trivial_validator_{}.pid'.format(app_name)
-    daemon.lock_file = 'sample_trivial_validator_{}.lock'.format(app_name)
-    daemon.output = 'sample_trivial_validator_{}.log'.format(app_name)
+    daemon.cmd = f'sample_trivial_validator --app {app_name}'
+    daemon.pid_file = f'sample_trivial_validator_{app_name}.pid'
+    daemon.lock_file = f'sample_trivial_validator_{app_name}.lock'
+    daemon.output = f'sample_trivial_validator_{app_name}.log'
 
 def lock_file(filename):
     os.umask(02)
@@ -116,11 +127,11 @@ def main():
         sys.exit(1)
 
     hostname = socket.gethostname().split('.')[0]
-    lockfile_name = os.path.join('pid_{}'.format(hostname), 'add_target.lock')
+    lockfile_name = os.path.join(f'pid_{hostname}', 'add_target.lock')
     try:
         lock_file(lockfile_name)
     except IOError:
-        print('Another {} process is running, please try again'.format(sys.argv[0]))
+        print(f'Another {sys.argv[0]} process is running, please try again')
 
     project_file = projectxml.ProjectFile('project.xml').read()
     config_file = configxml.ConfigFile('config.xml').read()
@@ -146,8 +157,9 @@ def main():
     subprocess.check_call(['bin/stop'])
     subprocess.check_call(['bin/start'])
 
-    print('New app versions installed into apps/{}_*. Make any changes you '
-          'need, then run bin/update_versions to install them.'.format(name))
+    print(
+        f'New app versions installed into apps/{name}_*. Make any changes you need, then run bin/update_versions to install them.'
+    )
 
 if __name__ == '__main__':
     main()

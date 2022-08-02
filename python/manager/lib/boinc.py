@@ -46,7 +46,9 @@ def stage_file(prefix, contents):
         with open(abspath, 'rb') as existing:
             if existing.read() != contents:
                 raise errors.InternalError(
-                    'Attempted to stage {} with differing contents'.format(filename))
+                    f'Attempted to stage {filename} with differing contents'
+                )
+
     else:
         with open(abspath, 'wb') as new_file:
             new_file.write(contents)
@@ -54,11 +56,11 @@ def stage_file(prefix, contents):
     return abspath
 
 def get_filename(prefix, hash):
-    return dir_hier_path('{}_{}'.format(prefix, hash))
+    return dir_hier_path(f'{prefix}_{hash}')
 
 def _filename_for_contents(prefix, contents):
     file_hash = hashlib.md5(contents).hexdigest()
-    return '{}_{}'.format(prefix, file_hash)
+    return f'{prefix}_{file_hash}'
 
 
 def submit_job(appname, cmdline, seed_file=None, seed_contents=None):
@@ -82,11 +84,10 @@ def submit_job(appname, cmdline, seed_file=None, seed_contents=None):
             create_work_args, cwd=app.config['BOINC_PROJECT_DIR'],
             stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
-        raise errors.BoincError('create_work returned error: {}'.format(e.output))
+        raise errors.BoincError(f'create_work returned error: {e.output}')
 
     for line in result.splitlines():
-        match = re.match(rb'created workunit; .*, ID ([0-9]+)', line)
-        if match:
-            return int(match.group(1))
+        if match := re.match(rb'created workunit; .*, ID ([0-9]+)', line):
+            return int(match[1])
 
-    raise errors.BoincError('Could not find ID in create_work output: {}'.format(result))
+    raise errors.BoincError(f'Could not find ID in create_work output: {result}')

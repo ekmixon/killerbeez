@@ -61,16 +61,13 @@ class fuzz_jobs(db.Model):
         :return: str if any configuration is stored for the given
         instrumentation/mutator/driver type, otherwise None.
         """
-        config_fullname = "{}_opts_{}".format(config_type, config_name)
+        config_fullname = f"{config_type}_opts_{config_name}"
         # First, check job-specific config
         config = self.configs.get(config_fullname)
         if config is None:
             # If nothing, fall back to target-specific config
             config = self.target.configs.get(config_fullname)
-        if config is None:
-            return None
-        # if we got a result from either of the queries, get the string value
-        return config.value
+        return None if config is None else config.value
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
